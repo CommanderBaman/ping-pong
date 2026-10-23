@@ -1,10 +1,10 @@
 mod ball;
 mod paddle;
 
-use crate::screen::{OutOfBoundError, Screen};
+use crate::terminal::{Terminal, TerminalError};
 
-pub trait Drawable<T: Screen> {
-    fn draw(&self, screen: &T) -> Result<(), OutOfBoundError>;
+pub trait Drawable<T: Terminal> {
+    fn draw(&self, term: &mut T) -> Result<(), TerminalError>;
 }
 
 pub type Ball = ball::Ball;

@@ -1,7 +1,7 @@
 use crate::{
     drawable::Drawable,
     model::{Coordinate, Point},
-    screen::{OutOfBoundError, Screen},
+    terminal::{Terminal, TerminalError},
 };
 
 pub struct Paddle {
@@ -21,10 +21,10 @@ impl Paddle {
     }
 }
 
-impl<T: Screen> Drawable<T> for Paddle {
-    fn draw(&self, screen: &T) -> Result<(), OutOfBoundError> {
+impl<T: Terminal> Drawable<T> for Paddle {
+    fn draw(&self, term: &mut T) -> Result<(), TerminalError> {
         for i in 0..self.length {
-            screen.draw(&Coordinate::new(self.top.x, self.top.y + i), self.character)?;
+            term.draw(&Coordinate::new(self.top.x, self.top.y + i), self.character)?;
         }
         Ok(())
     }

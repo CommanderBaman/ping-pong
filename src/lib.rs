@@ -1,33 +1,44 @@
 mod drawable;
 mod model;
-mod screen;
+mod terminal;
 
-use std::io::{self, Read, Write};
+use std::{io, time::Duration};
+
+use crossterm::event::{Event, poll, read};
 
 use crate::{
     drawable::{Ball, Drawable, Paddle},
     model::Coordinate,
-    screen::{Screen, TmuxScreen},
+    terminal::{Terminal, TerminalImpl},
 };
 
-fn pause() {
-    let mut stdout = io::stdout();
-    stdout.flush().unwrap();
-
-    let mut buffer = [0; 1];
-    let _ = io::stdin().read(&mut buffer);
+fn pause() -> Result<(), io::Error> {
+    loop {
+        if poll(Duration::from_millis(500))? {
+            match read()? {
+                Event::Key(event) => {
+                    if event.code.is_char('c') {
+                        return Ok(());
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
 }
 
 pub fn run() {
-    let screen = TmuxScreen::new();
+    let Ok(mut term) = TerminalImpl::new() else {
+        return;
+    };
     let paddle_left = Paddle::new(5, 0);
-    let paddle_right = Paddle::new(5, 120);
+    let paddle_right = Paddle::new(5, 520);
     let mut ball = Ball::new();
 
-    screen.clear();
-    paddle_left.draw(&screen).unwrap();
-    paddle_right.draw(&screen).unwrap();
+    let _ = term.clear();
+    paddle_left.draw(&mut term).unwrap();
+    paddle_right.draw(&mut term).unwrap();
     ball.place(Coordinate::new(1, 2));
-    ball.draw(&screen).unwrap();
-    pause();
+    ball.draw(&mut term).unwrap();
+    let _ = pause();
 }

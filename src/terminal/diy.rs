@@ -1,24 +1,18 @@
+#![allow(dead_code)]
+
 use std::io::{self, Write};
 
-use crate::model::{Coordinate, Point};
+use crate::{
+    model::{Coordinate, Point},
+    terminal::{Edge, Terminal, TerminalError},
+};
 
-#[derive(Debug)]
-pub struct OutOfBoundError;
-
-pub trait Screen {
-    fn clear(&self) {
-        print!("\x1B[2J\x1B[H");
-        io::stdout().flush().unwrap();
-    }
-    fn draw(&self, coordinate: &Coordinate, character: char) -> Result<(), OutOfBoundError>;
-}
-
-pub struct TmuxScreen {
+pub struct TmuxTerminal {
     height: Point,
     width: Point,
 }
 
-impl TmuxScreen {
+impl TmuxTerminal {
     pub fn new() -> Self {
         let height = 80;
         let width = 120;
@@ -26,12 +20,12 @@ impl TmuxScreen {
         assert!(width > 0);
         Self { height, width }
     }
-    fn is_bound(&self, coordinate: &Coordinate) -> Result<(), OutOfBoundError> {
+    fn is_bound(&self, coordinate: &Coordinate) -> Result<(), TerminalError> {
         if coordinate.x > self.width {
-            return Err(OutOfBoundError);
+            return Err(TerminalError::OutOfBound(coordinate.clone()));
         }
         if coordinate.y > self.height {
-            return Err(OutOfBoundError);
+            return Err(TerminalError::OutOfBound(coordinate.clone()));
         }
         Ok(())
     }
@@ -45,8 +39,13 @@ impl TmuxScreen {
         }
     }
 }
-impl Screen for TmuxScreen {
-    fn draw(&self, coordinate: &Coordinate, character: char) -> Result<(), OutOfBoundError> {
+impl Terminal for TmuxTerminal {
+    fn clear(&mut self) -> Result<(), TerminalError> {
+        print!("\x1B[2J\x1B[H");
+        io::stdout().flush()?;
+        Ok(())
+    }
+    fn draw(&mut self, coordinate: &Coordinate, character: char) -> Result<(), TerminalError> {
         self.is_bound(coordinate)?;
         print!(
             "\x1B[{};{}H{}",
@@ -57,11 +56,4 @@ impl Screen for TmuxScreen {
         io::stdout().flush().unwrap();
         Ok(())
     }
-}
-
-enum Edge {
-    TOP,
-    BOTTOM,
-    RIGHT,
-    LEFT,
 }

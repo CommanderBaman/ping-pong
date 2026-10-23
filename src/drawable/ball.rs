@@ -1,7 +1,7 @@
 use crate::{
     drawable::Drawable,
     model::{Coordinate, Velocity},
-    screen::{OutOfBoundError, Screen},
+    terminal::{Terminal, TerminalError},
 };
 
 pub struct Ball {
@@ -23,8 +23,8 @@ impl Ball {
     }
 }
 
-impl<T: Screen> Drawable<T> for Ball {
-    fn draw(&self, screen: &T) -> Result<(), OutOfBoundError> {
-        screen.draw(&self.location, self.character)
+impl<T: Terminal> Drawable<T> for Ball {
+    fn draw(&self, term: &mut T) -> Result<(), TerminalError> {
+        term.draw(&self.location, self.character)
     }
 }
