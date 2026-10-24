@@ -1,5 +1,4 @@
 use crate::{
-    constants,
     drawable::Drawable,
     model::{Coordinate, Position, Velocity},
     terminal::{Edge, Terminal, TerminalError},
@@ -46,6 +45,6 @@ impl<T: Terminal> Drawable<T> for Ball {
         term.draw(&self.coordinate(), self.character)
     }
     fn clear(&self, term: &mut T) -> Result<(), TerminalError> {
-        term.draw(&self.coordinate(), constants::EMPTY_CHARACTER)
+        term.erase(&self.coordinate())
     }
 }

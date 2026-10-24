@@ -1,5 +1,4 @@
 use crate::{
-    constants,
     drawable::Drawable,
     model::{Coordinate, Point},
     terminal::{Terminal, TerminalError},
@@ -36,10 +35,7 @@ impl Paddle {
 impl<T: Terminal> Drawable<T> for Paddle {
     fn clear(&self, term: &mut T) -> Result<(), TerminalError> {
         for i in 0..self.length {
-            term.draw(
-                &Coordinate::new(self.top.x, self.top.y + i),
-                constants::EMPTY_CHARACTER,
-            )?;
+            term.erase(&Coordinate::new(self.top.x, self.top.y + i))?;
         }
         Ok(())
     }
