@@ -1,4 +1,7 @@
-use std::{fmt::Display, ops::AddAssign};
+use std::{
+    fmt::Display,
+    ops::{Add, AddAssign, Div, Mul},
+};
 
 pub type Point = u16;
 
@@ -11,6 +14,25 @@ pub struct Vector<T> {
 impl<T> Vector<T> {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
+    }
+}
+
+pub trait Sqrt {
+    fn sqrt(self) -> Self;
+}
+impl Sqrt for f32 {
+    fn sqrt(self) -> Self {
+        self.sqrt()
+    }
+}
+
+impl<T: Copy + Add<Output = T> + Mul<Output = T> + Div<Output = T> + Sqrt> Vector<T> {
+    pub fn norm(mut self) -> Self {
+        let length = (self.x * self.x) + (self.y * self.y);
+        let length = length.sqrt();
+        self.x = self.x / length;
+        self.y = self.y / length;
+        self
     }
 }
 

@@ -50,11 +50,18 @@ impl Terminal for CrossTerminal {
     fn edge(&self, coordinate: &Coordinate) -> Option<Edge> {
         match (coordinate.x, coordinate.y) {
             (0, _) => Some(Edge::LEFT),
-            (x, _) if x == self.size.x => Some(Edge::RIGHT),
-            (_, y) if y == self.size.y => Some(Edge::BOTTOM),
+            (x, _) if x >= self.size.x => Some(Edge::RIGHT),
+            (_, y) if y >= self.size.y => Some(Edge::BOTTOM),
             (_, 0) => Some(Edge::TOP),
             _ => None,
         }
+    }
+    fn print(&mut self, value: &str) -> Result<(), TerminalError> {
+        for c in value.chars() {
+            self.writer.queue(style::Print(c))?;
+        }
+        self.update()?;
+        Ok(())
     }
 }
 
