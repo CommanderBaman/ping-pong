@@ -34,8 +34,17 @@ pub fn screen_loop<T: Terminal>(
                 _ => {}
             }
         }
+
         // update the ball with speed
         ball.update(term)?;
+
+        // if ball colliding with paddles, reverse direction in x
+        let ball_coordinate = ball.coordinate();
+        if paddle_left.occupied(&ball_coordinate) || paddle_right.occupied(&ball_coordinate) {
+            ball.reverse_horizontal();
+            ball.update(term)?;
+        }
+
         // if ball at edge, score
         match term.edge(&ball.coordinate()) {
             None | Some(Edge::TOP) | Some(Edge::BOTTOM) => {}

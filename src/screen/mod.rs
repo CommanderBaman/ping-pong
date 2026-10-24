@@ -81,10 +81,11 @@ pub fn screen_loop<T: Terminal>(term: &mut T) -> Result<(), AppError> {
     let mut score_board = ScoreBoard::new(term);
     let _ = game::screen_loop(term, &mut score_board)?;
     term.clear()?;
-    let board_string = format!("{}\n", score_board);
+    let board_string = format!(
+        "{}\nauto exiting after 5 seconds.\npress any key to exit...\n",
+        score_board
+    );
     term.print(&board_string)?;
-    term.print("auto exiting after 5 seconds.\n")?;
-    term.print("press any key to exit...\n")?;
     if poll(Duration::from_secs(5))? {}
     Ok(())
 }

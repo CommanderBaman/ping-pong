@@ -38,6 +38,9 @@ impl Ball {
         self.location += self.velocity;
         Ok(())
     }
+    pub fn reverse_horizontal(&mut self) {
+        self.velocity.x = -1.0 * self.velocity.x;
+    }
 }
 
 impl<T: Terminal> Drawable<T> for Ball {
