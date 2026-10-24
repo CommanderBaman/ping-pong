@@ -13,7 +13,7 @@ pub struct Ball {
 impl Ball {
     pub fn new() -> Self {
         Self {
-            character: 'O',
+            character: '⏺',
             location: Position::new(0.0, 0.0),
             velocity: Velocity::new(1.0, 1.0),
         }

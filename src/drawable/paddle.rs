@@ -14,7 +14,7 @@ impl Paddle {
     pub fn new(length: Point, column: Point) -> Self {
         assert!(length % 2 == 1);
         Self {
-            character: '|',
+            character: '█',
             top: Coordinate::new(column, 0),
             length,
         }
