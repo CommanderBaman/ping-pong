@@ -4,6 +4,7 @@ mod paddle;
 use crate::terminal::{Terminal, TerminalError};
 
 pub trait Drawable<T: Terminal> {
+    fn clear(&self, term: &mut T) -> Result<(), TerminalError>;
     fn draw(&self, term: &mut T) -> Result<(), TerminalError>;
 }
 

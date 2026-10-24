@@ -14,10 +14,13 @@ pub enum TerminalError {
 
 pub trait Terminal {
     fn clear(&mut self) -> Result<(), TerminalError>;
+    fn update(&mut self) -> Result<(), TerminalError>;
     fn draw(&mut self, coordinate: &Coordinate, character: char) -> Result<(), TerminalError>;
+    fn size(&self) -> &Coordinate;
+    fn edge(&self, coordinate: &Coordinate) -> Option<Edge>;
 }
 
-enum Edge {
+pub enum Edge {
     TOP,
     BOTTOM,
     RIGHT,

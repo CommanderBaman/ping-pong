@@ -29,7 +29,15 @@ impl TmuxTerminal {
         }
         Ok(())
     }
-    fn is_edge(&self, coordinate: &Coordinate) -> Option<Edge> {
+}
+impl Terminal for TmuxTerminal {
+    fn update(&mut self) -> Result<(), TerminalError> {
+        Ok(())
+    }
+    fn size(&self) -> &Coordinate {
+        unimplemented!()
+    }
+    fn edge(&self, coordinate: &Coordinate) -> Option<Edge> {
         match (coordinate.x, coordinate.y) {
             (0, _) => Some(Edge::LEFT),
             (x, _) if x == self.width => Some(Edge::RIGHT),
@@ -38,8 +46,6 @@ impl TmuxTerminal {
             _ => None,
         }
     }
-}
-impl Terminal for TmuxTerminal {
     fn clear(&mut self) -> Result<(), TerminalError> {
         print!("\x1B[2J\x1B[H");
         io::stdout().flush()?;

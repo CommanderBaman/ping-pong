@@ -4,11 +4,12 @@ use crossterm::{ExecutableCommand, QueueableCommand, cursor, queue, style, termi
 
 use crate::{
     model::Coordinate,
-    terminal::{Terminal, TerminalError},
+    terminal::{Edge, Terminal, TerminalError},
 };
 
 pub struct CrossTerminal {
     writer: io::Stdout,
+    size: Coordinate,
 }
 
 impl CrossTerminal {
@@ -17,11 +18,18 @@ impl CrossTerminal {
         queue!(writer, terminal::EnterAlternateScreen, cursor::Hide)?;
         writer.flush()?;
         terminal::enable_raw_mode()?;
-        Ok(Self { writer })
+        let size = terminal::size()?;
+        Ok(Self {
+            writer,
+            size: Coordinate::new(size.0, size.1),
+        })
     }
 }
 
 impl Terminal for CrossTerminal {
+    fn size(&self) -> &Coordinate {
+        &self.size
+    }
     fn clear(&mut self) -> Result<(), TerminalError> {
         self.writer
             .execute(terminal::Clear(terminal::ClearType::All))?;
@@ -33,8 +41,20 @@ impl Terminal for CrossTerminal {
             cursor::MoveTo(coordinate.x, coordinate.y),
             style::Print(character)
         )?;
+        Ok(())
+    }
+    fn update(&mut self) -> Result<(), TerminalError> {
         self.writer.flush()?;
         Ok(())
+    }
+    fn edge(&self, coordinate: &Coordinate) -> Option<Edge> {
+        match (coordinate.x, coordinate.y) {
+            (0, _) => Some(Edge::LEFT),
+            (x, _) if x == self.size.x => Some(Edge::RIGHT),
+            (_, y) if y == self.size.y => Some(Edge::BOTTOM),
+            (_, 0) => Some(Edge::TOP),
+            _ => None,
+        }
     }
 }
 
