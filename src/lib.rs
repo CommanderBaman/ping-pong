@@ -7,7 +7,7 @@ mod terminal;
 use thiserror::Error;
 
 use crate::{
-    screen::screen_loop,
+    screen::screen,
     terminal::{TerminalError, TerminalImpl},
 };
 
@@ -21,6 +21,6 @@ pub enum AppError {
 
 pub fn run() -> Result<(), AppError> {
     let mut term = TerminalImpl::new()?;
-    screen_loop(&mut term)?;
+    screen(&mut term)?;
     Ok(())
 }
