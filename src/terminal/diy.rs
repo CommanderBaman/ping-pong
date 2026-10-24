@@ -34,7 +34,7 @@ impl Terminal for TmuxTerminal {
     fn erase(&mut self, coordinate: &Coordinate) -> Result<(), TerminalError> {
         unimplemented!()
     }
-    fn print(&mut self, value: &str) -> Result<(), TerminalError> {
+    fn println(&mut self, value: &str) -> Result<(), TerminalError> {
         unimplemented!()
     }
     fn update(&mut self) -> Result<(), TerminalError> {

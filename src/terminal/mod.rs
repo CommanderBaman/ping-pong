@@ -21,7 +21,7 @@ pub trait Terminal {
     fn erase(&mut self, coordinate: &Coordinate) -> Result<(), TerminalError> {
         self.draw(coordinate, constants::EMPTY_CHARACTER)
     }
-    fn print(&mut self, value: &str) -> Result<(), TerminalError>;
+    fn println(&mut self, value: &str) -> Result<(), TerminalError>;
 }
 
 pub enum Edge {

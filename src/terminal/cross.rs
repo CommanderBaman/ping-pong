@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crossterm::{ExecutableCommand, QueueableCommand, cursor, queue, style, terminal};
+use crossterm::{QueueableCommand, cursor, execute, queue, style, terminal};
 
 use crate::{
     model::Coordinate,
@@ -31,8 +31,11 @@ impl Terminal for CrossTerminal {
         &self.size
     }
     fn clear(&mut self) -> Result<(), TerminalError> {
-        self.writer
-            .execute(terminal::Clear(terminal::ClearType::All))?;
+        execute!(
+            self.writer,
+            terminal::Clear(terminal::ClearType::All),
+            cursor::RestorePosition
+        )?;
         Ok(())
     }
     fn draw(&mut self, coordinate: &Coordinate, character: char) -> Result<(), TerminalError> {
@@ -56,10 +59,15 @@ impl Terminal for CrossTerminal {
             _ => None,
         }
     }
-    fn print(&mut self, value: &str) -> Result<(), TerminalError> {
+    fn println(&mut self, value: &str) -> Result<(), TerminalError> {
         for c in value.chars() {
-            self.writer.queue(style::Print(c))?;
+            if c == '\n' {
+                self.writer.queue(cursor::MoveToNextLine(1))?;
+            } else {
+                self.writer.queue(style::Print(c))?;
+            }
         }
+        self.writer.queue(cursor::MoveToNextLine(1))?;
         self.update()?;
         Ok(())
     }

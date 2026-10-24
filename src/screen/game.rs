@@ -55,9 +55,9 @@ pub fn screen_loop<T: Terminal>(
         }
         // draw all
         score_board.draw(term)?;
+        ball.draw(term)?;
         paddle_left.draw(term)?;
         paddle_right.draw(term)?;
-        ball.draw(term)?;
         if score_board.winner().is_some() {
             break;
         }
