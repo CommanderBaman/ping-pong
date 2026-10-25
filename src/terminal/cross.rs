@@ -71,6 +71,15 @@ impl Terminal for CrossTerminal {
         self.update()?;
         Ok(())
     }
+    fn print_mid(&mut self, value: &str) -> Result<(), TerminalError> {
+        queue!(
+            self.writer,
+            cursor::MoveToRow((self.size.y - value.len() as u16) / 2),
+            cursor::MoveToColumn((self.size.x - value.len() as u16) / 2),
+        )?;
+        self.println(value)?;
+        Ok(())
+    }
 }
 
 impl Drop for CrossTerminal {

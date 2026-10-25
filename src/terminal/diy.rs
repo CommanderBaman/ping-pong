@@ -68,4 +68,7 @@ impl Terminal for TmuxTerminal {
         io::stdout().flush().unwrap();
         Ok(())
     }
+    fn print_mid(&mut self, value: &str) -> Result<(), TerminalError> {
+        unimplemented!()
+    }
 }

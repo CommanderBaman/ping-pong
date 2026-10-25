@@ -22,6 +22,7 @@ pub trait Terminal {
         self.draw(coordinate, ' ')
     }
     fn println(&mut self, value: &str) -> Result<(), TerminalError>;
+    fn print_mid(&mut self, value: &str) -> Result<(), TerminalError>;
 }
 
 pub enum Edge {

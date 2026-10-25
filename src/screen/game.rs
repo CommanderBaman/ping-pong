@@ -79,13 +79,7 @@ impl<T: Terminal> Drawable<T> for ScoreBoard {
     }
 }
 
-pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError> {
-    let mut score_board = ScoreBoard::new(term, config);
-    let _ = game_loop(term, config, &mut score_board)?;
-    term.clear()?;
-    let board_string = format!("{}", score_board);
-    term.println(&board_string)?;
-    term.println("press any key to go back to home screen...")?;
+fn wait_for_key_press() -> Result<(), AppError> {
     loop {
         if poll(Duration::from_secs(5))? {
             match read()? {
@@ -94,6 +88,17 @@ pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError
             }
         }
     }
+    Ok(())
+}
+
+pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError> {
+    let mut score_board = ScoreBoard::new(term, config);
+    let _ = game_loop(term, config, &mut score_board)?;
+    term.clear()?;
+    let board_string = format!("{}", score_board);
+    term.println(&board_string)?;
+    term.println("press any key to go back to home screen...")?;
+    wait_for_key_press()?;
     Ok(())
 }
 
@@ -119,6 +124,12 @@ fn game_loop<T: Terminal>(
                     Some('j') => paddle_right.move_down(term)?,
                     Some('k') => paddle_right.move_up(term)?,
                     Some('q') => break,
+                    Some('b') => {
+                        term.print_mid("BREAK!")?;
+                        wait_for_key_press()?;
+                        // erasing the break
+                        term.print_mid("      ")?;
+                    }
                     _ => {}
                 },
                 _ => {}
@@ -138,9 +149,7 @@ fn game_loop<T: Terminal>(
         // if ball at edge, score
         match term.edge(&ball.coordinate()) {
             None | Some(Edge::TOP) | Some(Edge::BOTTOM) => {}
-            Some(Edge::LEFT) => {
-                score_board.score_left();
-            }
+            Some(Edge::LEFT) => score_board.score_left(),
             Some(Edge::RIGHT) => score_board.score_right(),
         }
         // draw all
