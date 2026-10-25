@@ -71,4 +71,7 @@ impl Terminal for TmuxTerminal {
     fn print_mid(&mut self, value: &str, shift: Option<i16>) -> Result<(), TerminalError> {
         unimplemented!()
     }
+    fn read_line(&mut self) -> Result<String, TerminalError> {
+        unimplemented!()
+    }
 }

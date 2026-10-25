@@ -1,6 +1,13 @@
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    time::Duration,
+};
 
-use crossterm::{QueueableCommand, cursor, execute, queue, style, terminal};
+use crossterm::{
+    ExecutableCommand, QueueableCommand, cursor,
+    event::{Event, KeyCode, poll, read},
+    execute, queue, style, terminal,
+};
 
 use crate::{
     model::{Coordinate, Point},
@@ -86,6 +93,34 @@ impl Terminal for CrossTerminal {
             self.println(line)?;
         }
         Ok(())
+    }
+    fn read_line(&mut self) -> Result<String, TerminalError> {
+        let mut line = String::new();
+        self.writer.execute(cursor::Show)?;
+        loop {
+            if poll(Duration::from_secs(5))? {
+                match read()? {
+                    Event::Key(event) => match event.code {
+                        KeyCode::Enter => break,
+                        KeyCode::Char(c) => {
+                            line.push(c);
+                            self.writer.execute(style::Print(c))?;
+                        }
+                        KeyCode::Backspace => {
+                            self.writer.execute(cursor::MoveLeft(1))?;
+                            self.writer.execute(style::Print(' '))?;
+                            self.writer.execute(cursor::MoveLeft(1))?;
+                            line.pop();
+                        }
+                        _ => {}
+                    },
+                    _ => {}
+                }
+            }
+        }
+        // FIX: this hide does not run if any of the above fail
+        self.writer.execute(cursor::Hide)?;
+        Ok(line)
     }
 }
 

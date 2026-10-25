@@ -23,6 +23,7 @@ pub trait Terminal {
     }
     fn println(&mut self, value: &str) -> Result<(), TerminalError>;
     fn print_mid(&mut self, value: &str, row_shift: Option<i16>) -> Result<(), TerminalError>;
+    fn read_line(&mut self) -> Result<String, TerminalError>;
 }
 
 pub enum Edge {

@@ -5,7 +5,7 @@ use std::{
 
 pub type Point = u16;
 pub type Real = f32;
-pub type Score = u8;
+pub type Score = u16;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector<T> {

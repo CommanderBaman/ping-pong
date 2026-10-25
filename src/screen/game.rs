@@ -5,6 +5,7 @@ use crate::{
     config::Config,
     drawable::{Ball, Drawable, Paddle},
     model::{Coordinate, Point, Score},
+    screen::wait_for_key_press,
     terminal::{Edge, Terminal, TerminalError},
 };
 use crossterm::event::{Event, poll, read};
@@ -81,18 +82,6 @@ impl<T: Terminal> Drawable<T> for ScoreBoard {
         }
         Ok(())
     }
-}
-
-fn wait_for_key_press() -> Result<(), AppError> {
-    loop {
-        if poll(Duration::from_secs(5))? {
-            match read()? {
-                Event::Key(_) => break,
-                _ => {}
-            }
-        }
-    }
-    Ok(())
 }
 
 pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError> {
