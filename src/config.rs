@@ -26,7 +26,7 @@ impl Config {
             max_score: 2,
             points_per_goal: 1,
             random_bounce: false,
-            initial_ball_speed: 2.0,
+            initial_ball_speed: 30.0,
             ball_speed_multiplier: 1.0,
         }
     }

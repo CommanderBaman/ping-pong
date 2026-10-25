@@ -12,6 +12,7 @@ pub struct Ball {
     velocity: Velocity,
     random_bounce: bool,
     speed_multiplier: Real,
+    dt: Real,
 }
 
 impl Ball {
@@ -24,6 +25,8 @@ impl Ball {
                 .power(config.initial_ball_speed),
             random_bounce: config.random_bounce,
             speed_multiplier: config.ball_speed_multiplier,
+            // 1 s = 1 step, dt will take frames per second as input
+            dt: 1.0 / config.frames_per_second as Real,
         }
     }
     pub fn coordinate(&self) -> Coordinate {
@@ -43,7 +46,7 @@ impl Ball {
             Some(Edge::RIGHT) => self.velocity.x = -1.0 * self.velocity.x.abs(),
             None => {}
         }
-        self.location += self.velocity;
+        self.location += self.velocity * self.dt;
         Ok(())
     }
     fn speed(&mut self) -> Real {

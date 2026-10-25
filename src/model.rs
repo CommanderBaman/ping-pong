@@ -53,6 +53,15 @@ impl<T: AddAssign> AddAssign for Vector<T> {
     }
 }
 
+impl Mul<Real> for Vector<Real> {
+    type Output = Self;
+    fn mul(mut self, rhs: Real) -> Self::Output {
+        self.x = self.x * rhs;
+        self.y = self.y * rhs;
+        self
+    }
+}
+
 impl<T: Display> Display for Vector<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{})", self.x, self.y)
