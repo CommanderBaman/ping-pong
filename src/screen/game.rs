@@ -1,7 +1,8 @@
 use std::time::Duration;
 
 use crate::{
-    AppError, constants,
+    AppError,
+    config::Config,
     drawable::{Ball, Drawable, Paddle},
     model::Coordinate,
     terminal::{Edge, Terminal, TerminalError},
@@ -11,31 +12,35 @@ use crossterm::event::{Event, poll, read};
 struct ScoreBoard {
     pub left: u8,
     pub right: u8,
+    max_score: u8,
+    points_per_goal: u8,
     mid: Coordinate,
 }
 
 impl ScoreBoard {
-    pub fn new<T: Terminal>(term: &T) -> Self {
+    pub fn new<T: Terminal>(term: &T, config: &Config) -> Self {
         let size = term.size();
         let mid = Coordinate::new(size.x / 2, 0);
         Self {
             left: 0,
             right: 0,
             mid,
+            max_score: config.max_score,
+            points_per_goal: config.points_per_goal,
         }
     }
     pub fn score_left(&mut self) {
-        self.right += constants::POINT_PER_GOAL;
+        self.right += self.points_per_goal;
     }
     pub fn score_right(&mut self) {
-        self.left += constants::POINT_PER_GOAL;
+        self.left += self.points_per_goal;
     }
     pub fn winner(&self) -> Option<bool> {
         // true means left won
-        if self.left >= constants::MAX_SCORE {
+        if self.left >= self.max_score {
             return Some(true);
         }
-        if self.right >= constants::MAX_SCORE {
+        if self.right >= self.max_score {
             return Some(false);
         }
         None
@@ -74,9 +79,9 @@ impl<T: Terminal> Drawable<T> for ScoreBoard {
     }
 }
 
-pub fn screen<T: Terminal>(term: &mut T) -> Result<(), AppError> {
-    let mut score_board = ScoreBoard::new(term);
-    let _ = game_loop(term, &mut score_board)?;
+pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError> {
+    let mut score_board = ScoreBoard::new(term, config);
+    let _ = game_loop(term, config, &mut score_board)?;
     term.clear()?;
     let board_string = format!("{}", score_board);
     term.println(&board_string)?;
@@ -92,13 +97,17 @@ pub fn screen<T: Terminal>(term: &mut T) -> Result<(), AppError> {
     Ok(())
 }
 
-fn game_loop<T: Terminal>(term: &mut T, score_board: &mut ScoreBoard) -> Result<(), AppError> {
+fn game_loop<T: Terminal>(
+    term: &mut T,
+    config: &Config,
+    score_board: &mut ScoreBoard,
+) -> Result<(), AppError> {
     term.clear()?;
     let term_size = term.size();
-    let mut paddle_left = Paddle::new(constants::PADDLE_LENGTH, 0);
-    let paddle_right = Paddle::new(constants::PADDLE_LENGTH, term_size.x);
+    let mut paddle_left = Paddle::new(config.paddle_length, 0, config.paddle_speed);
+    let paddle_right = Paddle::new(config.paddle_length, term_size.x, config.paddle_speed);
     let mut ball = Ball::new();
-    let frame_time = Duration::from_millis(1000 / constants::FRAMES_PER_SECOND);
+    let frame_time = Duration::from_millis(1000 / config.frames_per_second);
     // place ball in middle
     ball.place(Coordinate::new(term_size.x / 2, term_size.y / 2));
     loop {

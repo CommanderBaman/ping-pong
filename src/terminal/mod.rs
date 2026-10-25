@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::{constants, model::Coordinate};
+use crate::model::Coordinate;
 mod cross;
 mod diy;
 
@@ -19,7 +19,7 @@ pub trait Terminal {
     fn size(&self) -> &Coordinate;
     fn edge(&self, coordinate: &Coordinate) -> Option<Edge>;
     fn erase(&mut self, coordinate: &Coordinate) -> Result<(), TerminalError> {
-        self.draw(coordinate, constants::EMPTY_CHARACTER)
+        self.draw(coordinate, ' ')
     }
     fn println(&mut self, value: &str) -> Result<(), TerminalError>;
 }

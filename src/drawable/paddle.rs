@@ -1,5 +1,4 @@
 use crate::{
-    constants,
     drawable::Drawable,
     model::{Coordinate, Point},
     terminal::{Terminal, TerminalError},
@@ -9,26 +8,28 @@ pub struct Paddle {
     character: char,
     top: Coordinate,
     length: Point,
+    speed: u16,
 }
 
 impl Paddle {
-    pub fn new(length: Point, column: Point) -> Self {
+    pub fn new(length: Point, column: Point, speed: u16) -> Self {
         assert!(length % 2 == 1);
         Self {
             character: '█',
             top: Coordinate::new(column, 0),
             length,
+            speed,
         }
     }
     pub fn move_up<T: Terminal>(&mut self, term: &mut T) -> Result<(), TerminalError> {
         self.clear(term)?;
-        self.top.y = self.top.y.saturating_sub(constants::PADDLE_SPEED);
+        self.top.y = self.top.y.saturating_sub(self.speed);
         Ok(())
     }
     pub fn move_down<T: Terminal>(&mut self, term: &mut T) -> Result<(), TerminalError> {
         self.clear(term)?;
         let max_y = term.size().y;
-        self.top.y = (self.top.y + constants::PADDLE_SPEED).min(max_y - self.length);
+        self.top.y = (self.top.y + self.speed).min(max_y - self.length);
         Ok(())
     }
     pub fn occupied(&self, coordinate: &Coordinate) -> bool {

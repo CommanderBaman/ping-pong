@@ -1,4 +1,4 @@
-mod constants;
+mod config;
 mod drawable;
 mod model;
 mod screen;
@@ -7,6 +7,7 @@ mod terminal;
 use thiserror::Error;
 
 use crate::{
+    config::Config,
     screen::screen,
     terminal::{TerminalError, TerminalImpl},
 };
@@ -21,6 +22,7 @@ pub enum AppError {
 
 pub fn run() -> Result<(), AppError> {
     let mut term = TerminalImpl::new()?;
-    screen(&mut term)?;
+    let mut config = Config::new();
+    screen(&mut term, &mut config)?;
     Ok(())
 }

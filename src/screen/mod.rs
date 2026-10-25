@@ -2,11 +2,11 @@ use std::time::Duration;
 
 use crossterm::event::{Event, poll, read};
 
-use crate::{AppError, terminal::Terminal};
+use crate::{AppError, config::Config, terminal::Terminal};
 
 mod game;
 
-pub fn screen<T: Terminal>(term: &mut T) -> Result<(), AppError> {
+pub fn screen<T: Terminal>(term: &mut T, config: &mut Config) -> Result<(), AppError> {
     loop {
         term.clear()?;
         term.println("Welcome to Ping Pong!")?;
@@ -16,7 +16,7 @@ pub fn screen<T: Terminal>(term: &mut T) -> Result<(), AppError> {
             match read()? {
                 Event::Key(event) => match event.code.as_char() {
                     Some('q') => break,
-                    Some('n') => game::screen(term)?,
+                    Some('n') => game::screen(term, config)?,
                     _ => {}
                 },
                 _ => {}
