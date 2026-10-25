@@ -105,7 +105,7 @@ fn game_loop<T: Terminal>(
     term.clear()?;
     let term_size = term.size();
     let mut paddle_left = Paddle::new(config.paddle_length, 0, config.paddle_speed);
-    let paddle_right = Paddle::new(config.paddle_length, term_size.x, config.paddle_speed);
+    let mut paddle_right = Paddle::new(config.paddle_length, term_size.x, config.paddle_speed);
     let mut ball = Ball::new();
     let frame_time = Duration::from_millis(1000 / config.frames_per_second);
     // place ball in middle
@@ -114,8 +114,10 @@ fn game_loop<T: Terminal>(
         if poll(frame_time)? {
             match read()? {
                 Event::Key(event) => match event.code.as_char() {
-                    Some('k') => paddle_left.move_up(term)?,
-                    Some('j') => paddle_left.move_down(term)?,
+                    Some('d') => paddle_left.move_down(term)?,
+                    Some('f') => paddle_left.move_up(term)?,
+                    Some('j') => paddle_right.move_down(term)?,
+                    Some('k') => paddle_right.move_up(term)?,
                     Some('q') => {
                         break;
                     }
