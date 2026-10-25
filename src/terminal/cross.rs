@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use crossterm::{QueueableCommand, cursor, execute, queue, style, terminal};
 
 use crate::{
-    model::Coordinate,
+    model::{Coordinate, Point},
     terminal::{Edge, Terminal, TerminalError},
 };
 
@@ -71,13 +71,20 @@ impl Terminal for CrossTerminal {
         self.update()?;
         Ok(())
     }
-    fn print_mid(&mut self, value: &str) -> Result<(), TerminalError> {
-        queue!(
-            self.writer,
-            cursor::MoveToRow((self.size.y - value.len() as u16) / 2),
-            cursor::MoveToColumn((self.size.x - value.len() as u16) / 2),
-        )?;
-        self.println(value)?;
+    fn print_mid(&mut self, value: &str, shift: Option<i16>) -> Result<(), TerminalError> {
+        for (index, line) in value.lines().enumerate() {
+            let shift = shift.unwrap_or(0) as Point;
+            let row_number = (self.size.y / 2)
+                .wrapping_add(shift)
+                .saturating_add(index as Point);
+            let column_number = (self.size.x - line.len() as Point) / 2;
+            queue!(
+                self.writer,
+                cursor::MoveToRow(row_number),
+                cursor::MoveToColumn(column_number),
+            )?;
+            self.println(line)?;
+        }
         Ok(())
     }
 }

@@ -15,6 +15,7 @@ struct ScoreBoard {
     max_score: Score,
     points_per_goal: Score,
     mid: Coordinate,
+    pub last_scored: Option<bool>,
 }
 
 impl ScoreBoard {
@@ -27,12 +28,15 @@ impl ScoreBoard {
             mid,
             max_score: config.max_score,
             points_per_goal: config.points_per_goal,
+            last_scored: None,
         }
     }
-    pub fn score_left(&mut self) {
+    pub fn score_right(&mut self) {
+        self.last_scored = Some(false);
         self.right += self.points_per_goal;
     }
-    pub fn score_right(&mut self) {
+    pub fn score_left(&mut self) {
+        self.last_scored = Some(true);
         self.left += self.points_per_goal;
     }
     pub fn winner(&self) -> Option<bool> {
@@ -93,11 +97,29 @@ fn wait_for_key_press() -> Result<(), AppError> {
 
 pub fn screen<T: Terminal>(term: &mut T, config: &Config) -> Result<(), AppError> {
     let mut score_board = ScoreBoard::new(term, config);
-    let _ = game_loop(term, config, &mut score_board)?;
+    let mut stopped = false;
+    while !stopped && score_board.winner().is_none() {
+        term.clear()?;
+        if let Some(left_scored) = score_board.last_scored {
+            if left_scored {
+                term.print_mid("Left scored", Some(-1))?;
+            } else {
+                term.print_mid("Right scored", Some(-1))?;
+            }
+            term.print_mid("Press any key to continue", Some(0))?;
+            wait_for_key_press()?;
+        }
+        stopped = game_loop(term, config, &mut score_board)?;
+    }
     term.clear()?;
+    let mut result_string = String::new();
+    if stopped {
+        result_string += "game stopped\n";
+    }
     let board_string = format!("{}", score_board);
-    term.println(&board_string)?;
-    term.println("press any key to go back to home screen...")?;
+    result_string += &board_string;
+    result_string += "\npress any key to go back to home screen...";
+    term.print_mid(&result_string, None)?;
     wait_for_key_press()?;
     Ok(())
 }
@@ -106,7 +128,7 @@ fn game_loop<T: Terminal>(
     term: &mut T,
     config: &Config,
     score_board: &mut ScoreBoard,
-) -> Result<(), AppError> {
+) -> Result<bool, AppError> {
     term.clear()?;
     let term_size = term.size();
     let mut paddle_left = Paddle::new(config.paddle_length, 0, config.paddle_speed);
@@ -115,7 +137,7 @@ fn game_loop<T: Terminal>(
     let frame_time = Duration::from_millis(1000 / config.frames_per_second);
     // place ball in middle
     ball.place(Coordinate::new(term_size.x / 2, term_size.y / 2));
-    loop {
+    while score_board.winner().is_none() {
         if poll(frame_time)? {
             match read()? {
                 Event::Key(event) => match event.code.as_char() {
@@ -123,12 +145,12 @@ fn game_loop<T: Terminal>(
                     Some('f') => paddle_left.move_up(term)?,
                     Some('j') => paddle_right.move_down(term)?,
                     Some('k') => paddle_right.move_up(term)?,
-                    Some('q') => break,
+                    Some('q') => return Ok(true),
                     Some('b') => {
-                        term.print_mid("BREAK!")?;
+                        term.print_mid("BREAK!", Some(0))?;
                         wait_for_key_press()?;
                         // erasing the break
-                        term.print_mid("      ")?;
+                        term.print_mid("      ", Some(0))?;
                     }
                     _ => {}
                 },
@@ -149,18 +171,21 @@ fn game_loop<T: Terminal>(
         // if ball at edge, score
         match term.edge(&ball.coordinate()) {
             None | Some(Edge::TOP) | Some(Edge::BOTTOM) => {}
-            Some(Edge::LEFT) => score_board.score_left(),
-            Some(Edge::RIGHT) => score_board.score_right(),
+            Some(Edge::LEFT) => {
+                score_board.score_right();
+                break;
+            }
+            Some(Edge::RIGHT) => {
+                score_board.score_left();
+                break;
+            }
         }
         // draw all
         score_board.draw(term)?;
         ball.draw(term)?;
         paddle_left.draw(term)?;
         paddle_right.draw(term)?;
-        if score_board.winner().is_some() {
-            break;
-        }
         term.update()?;
     }
-    Ok(())
+    Ok(false)
 }
