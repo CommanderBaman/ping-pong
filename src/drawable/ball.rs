@@ -1,7 +1,7 @@
 use crate::{
     config::Config,
     drawable::Drawable,
-    model::{Coordinate, Position, Velocity},
+    model::{Coordinate, Position, Real, Velocity},
     random,
     terminal::{Edge, Terminal, TerminalError},
 };
@@ -11,6 +11,7 @@ pub struct Ball {
     location: Position,
     velocity: Velocity,
     random_bounce: bool,
+    speed_multiplier: Real,
 }
 
 impl Ball {
@@ -18,8 +19,11 @@ impl Ball {
         Self {
             character: '⏺',
             location: Position::new(0.0, 0.0),
-            velocity: Velocity::new(1.0, 1.0).norm().power(config.ball_speed),
+            velocity: Velocity::new(1.0, 1.0)
+                .norm()
+                .power(config.initial_ball_speed),
             random_bounce: config.random_bounce,
+            speed_multiplier: config.ball_speed_multiplier,
         }
     }
     pub fn coordinate(&self) -> Coordinate {
@@ -42,12 +46,17 @@ impl Ball {
         self.location += self.velocity;
         Ok(())
     }
+    fn speed(&mut self) -> Real {
+        self.velocity.magnitude()
+    }
     pub fn bounce_horizontal(&mut self) {
+        let speed = self.speed();
+        self.velocity = self.velocity.norm().power(speed * self.speed_multiplier);
         self.velocity.x = -1.0 * self.velocity.x;
         if self.random_bounce {
-            let speed = self.velocity.magnitude();
-            self.velocity.x = random::f32();
-            self.velocity.y = random::f32();
+            let speed = self.speed();
+            self.velocity.x = random::real();
+            self.velocity.y = random::real();
             self.velocity = self.velocity.norm().power(speed);
         }
     }

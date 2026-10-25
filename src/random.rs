@@ -1,3 +1,5 @@
-pub fn f32() -> f32 {
+use crate::model::Real;
+
+pub fn real() -> Real {
     rand::random()
 }

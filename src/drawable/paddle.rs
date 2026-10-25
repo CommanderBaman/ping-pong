@@ -8,11 +8,11 @@ pub struct Paddle {
     character: char,
     top: Coordinate,
     length: Point,
-    speed: u16,
+    speed: Point,
 }
 
 impl Paddle {
-    pub fn new(length: Point, column: Point, speed: u16) -> Self {
+    pub fn new(length: Point, column: Point, speed: Point) -> Self {
         assert!(length % 2 == 1);
         Self {
             character: '█',

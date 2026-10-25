@@ -4,16 +4,16 @@ use crate::{
     AppError,
     config::Config,
     drawable::{Ball, Drawable, Paddle},
-    model::Coordinate,
+    model::{Coordinate, Point, Score},
     terminal::{Edge, Terminal, TerminalError},
 };
 use crossterm::event::{Event, poll, read};
 
 struct ScoreBoard {
-    pub left: u8,
-    pub right: u8,
-    max_score: u8,
-    points_per_goal: u8,
+    pub left: Score,
+    pub right: Score,
+    max_score: Score,
+    points_per_goal: Score,
     mid: Coordinate,
 }
 
@@ -67,12 +67,12 @@ impl<T: Terminal> Drawable<T> for ScoreBoard {
     }
     fn draw(&self, term: &mut T) -> Result<(), TerminalError> {
         for (i, c) in self.left.to_string().chars().rev().enumerate() {
-            let coordinate = Coordinate::new(self.mid.x - (i as u16) - 1, self.mid.y);
+            let coordinate = Coordinate::new(self.mid.x - (i as Point) - 1, self.mid.y);
             term.draw(&coordinate, c)?;
         }
         term.draw(&self.mid, ':')?;
         for (i, c) in self.right.to_string().chars().enumerate() {
-            let coordinate = Coordinate::new(self.mid.x + (i as u16) + 1, self.mid.y);
+            let coordinate = Coordinate::new(self.mid.x + (i as Point) + 1, self.mid.y);
             term.draw(&coordinate, c)?;
         }
         Ok(())
@@ -118,9 +118,7 @@ fn game_loop<T: Terminal>(
                     Some('f') => paddle_left.move_up(term)?,
                     Some('j') => paddle_right.move_down(term)?,
                     Some('k') => paddle_right.move_up(term)?,
-                    Some('q') => {
-                        break;
-                    }
+                    Some('q') => break,
                     _ => {}
                 },
                 _ => {}

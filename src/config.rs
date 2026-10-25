@@ -1,11 +1,14 @@
+use crate::model::{Point, Real, Score};
+
 pub struct Config {
-    pub paddle_length: u16,
-    pub paddle_speed: u16,
+    pub paddle_length: Point,
+    pub paddle_speed: Point,
     pub frames_per_second: u64,
-    pub max_score: u8,
-    pub points_per_goal: u8,
+    pub max_score: Score,
+    pub points_per_goal: Score,
     pub random_bounce: bool,
-    pub ball_speed: f32,
+    pub initial_ball_speed: Real,
+    pub ball_speed_multiplier: Real,
 }
 
 impl Config {
@@ -16,8 +19,9 @@ impl Config {
             frames_per_second: 30,
             max_score: 2,
             points_per_goal: 1,
-            random_bounce: true,
-            ball_speed: 2.0,
+            random_bounce: false,
+            initial_ball_speed: 2.0,
+            ball_speed_multiplier: 1.0,
         }
     }
 }

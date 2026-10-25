@@ -4,6 +4,8 @@ use std::{
 };
 
 pub type Point = u16;
+pub type Real = f32;
+pub type Score = u8;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector<T> {
@@ -20,7 +22,7 @@ impl<T> Vector<T> {
 pub trait Sqrt {
     fn sqrt(self) -> Self;
 }
-impl Sqrt for f32 {
+impl Sqrt for Real {
     fn sqrt(self) -> Self {
         self.sqrt()
     }
@@ -38,7 +40,6 @@ impl<T: Copy + Add<Output = T> + Mul<Output = T> + Div<Output = T> + Sqrt> Vecto
         self
     }
     pub fn power(mut self, p: T) -> Self {
-        let p = p.sqrt();
         self.x = self.x * p;
         self.y = self.y * p;
         self
@@ -58,18 +59,18 @@ impl<T: Display> Display for Vector<T> {
     }
 }
 
-pub type Coordinate = Vector<u16>;
-pub type Position = Vector<f32>;
-pub type Velocity = Vector<f32>;
+pub type Coordinate = Vector<Point>;
+pub type Position = Vector<Real>;
+pub type Velocity = Vector<Real>;
 
 impl From<Position> for Coordinate {
     fn from(value: Position) -> Self {
-        Coordinate::new(value.x as u16, value.y as u16)
+        Coordinate::new(value.x as Point, value.y as Point)
     }
 }
 
 impl From<Coordinate> for Position {
     fn from(value: Coordinate) -> Self {
-        Position::new(value.x as f32, value.y as f32)
+        Position::new(value.x as Real, value.y as Real)
     }
 }
