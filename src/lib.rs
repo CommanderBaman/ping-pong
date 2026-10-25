@@ -1,6 +1,7 @@
 mod config;
 mod drawable;
 mod model;
+mod random;
 mod screen;
 mod terminal;
 

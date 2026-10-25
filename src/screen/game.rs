@@ -106,7 +106,7 @@ fn game_loop<T: Terminal>(
     let term_size = term.size();
     let mut paddle_left = Paddle::new(config.paddle_length, 0, config.paddle_speed);
     let mut paddle_right = Paddle::new(config.paddle_length, term_size.x, config.paddle_speed);
-    let mut ball = Ball::new();
+    let mut ball = Ball::new(config);
     let frame_time = Duration::from_millis(1000 / config.frames_per_second);
     // place ball in middle
     ball.place(Coordinate::new(term_size.x / 2, term_size.y / 2));
@@ -133,7 +133,7 @@ fn game_loop<T: Terminal>(
         // if ball colliding with paddles, reverse direction in x
         let ball_coordinate = ball.coordinate();
         if paddle_left.occupied(&ball_coordinate) || paddle_right.occupied(&ball_coordinate) {
-            ball.reverse_horizontal();
+            ball.bounce_horizontal();
             ball.update(term)?;
         }
 

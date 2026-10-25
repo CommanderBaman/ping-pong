@@ -27,11 +27,20 @@ impl Sqrt for f32 {
 }
 
 impl<T: Copy + Add<Output = T> + Mul<Output = T> + Div<Output = T> + Sqrt> Vector<T> {
+    pub fn magnitude(&self) -> T {
+        let magnitude = (self.x * self.x) + (self.y * self.y);
+        magnitude.sqrt()
+    }
     pub fn norm(mut self) -> Self {
-        let length = (self.x * self.x) + (self.y * self.y);
-        let length = length.sqrt();
+        let length = self.magnitude();
         self.x = self.x / length;
         self.y = self.y / length;
+        self
+    }
+    pub fn power(mut self, p: T) -> Self {
+        let p = p.sqrt();
+        self.x = self.x * p;
+        self.y = self.y * p;
         self
     }
 }

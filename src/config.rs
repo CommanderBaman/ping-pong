@@ -4,6 +4,8 @@ pub struct Config {
     pub frames_per_second: u64,
     pub max_score: u8,
     pub points_per_goal: u8,
+    pub random_bounce: bool,
+    pub ball_speed: f32,
 }
 
 impl Config {
@@ -14,6 +16,8 @@ impl Config {
             frames_per_second: 30,
             max_score: 2,
             points_per_goal: 1,
+            random_bounce: true,
+            ball_speed: 2.0,
         }
     }
 }

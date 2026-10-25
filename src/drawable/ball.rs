@@ -1,6 +1,8 @@
 use crate::{
+    config::Config,
     drawable::Drawable,
     model::{Coordinate, Position, Velocity},
+    random,
     terminal::{Edge, Terminal, TerminalError},
 };
 
@@ -8,14 +10,16 @@ pub struct Ball {
     character: char,
     location: Position,
     velocity: Velocity,
+    random_bounce: bool,
 }
 
 impl Ball {
-    pub fn new() -> Self {
+    pub fn new(config: &Config) -> Self {
         Self {
             character: '⏺',
             location: Position::new(0.0, 0.0),
-            velocity: Velocity::new(1.0, 1.0),
+            velocity: Velocity::new(1.0, 1.0).norm().power(config.ball_speed),
+            random_bounce: config.random_bounce,
         }
     }
     pub fn coordinate(&self) -> Coordinate {
@@ -38,8 +42,14 @@ impl Ball {
         self.location += self.velocity;
         Ok(())
     }
-    pub fn reverse_horizontal(&mut self) {
+    pub fn bounce_horizontal(&mut self) {
         self.velocity.x = -1.0 * self.velocity.x;
+        if self.random_bounce {
+            let speed = self.velocity.magnitude();
+            self.velocity.x = random::f32();
+            self.velocity.y = random::f32();
+            self.velocity = self.velocity.norm().power(speed);
+        }
     }
 }
 
